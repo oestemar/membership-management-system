@@ -9,6 +9,7 @@ from utils.validation import validate_user_input, validate_user_pw_input
 from itsdangerous import URLSafeTimedSerializer
 import csv
 import io
+import os
 
 app = Flask(__name__)
 app.secret_key = 'oestemar'

@@ -52,6 +52,40 @@ from utils.mail import send_register_mail, send_withdraw_mail, send_password_res
 
 bp = Blueprint('main', __name__)
 
+#####################################
+#管理者設定のため一度だけ実行
+#####################################
+
+@app.route('/create_admin')
+def create_admin():
+    # すでに super が存在するなら実行しない（初期化は一度だけ）
+    existing_super = Admin.query.filter_by(username='super').first()
+    if existing_super:
+        return "Admins already created", 403
+
+    from werkzeug.security import generate_password_hash
+
+    # 通常管理者 admin01
+    admin01 = Admin(
+        username='admin01',
+        role='admin',
+        password_hash=generate_password_hash('admin01')
+    )
+
+    # 上位管理者 super
+    super_admin = Admin(
+        username='super',
+        role='super',
+        password_hash=generate_password_hash('super')
+    )
+
+    db.session.add(admin01)
+    db.session.add(super_admin)
+    db.session.commit()
+
+    return "Initial admins created"
+
+
 ########################################
 # 一般ユーザー向け
 ########################################

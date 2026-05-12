@@ -1,0 +1,61 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- <link rel="stylesheet" href="../static/style.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <aside class="menu">
+    <ul>
+        <li><a href="/">TOP</a></li>
+        <li><a href="/register">会員登録</a></li>
+        <li><a href="/login">会員ログイン</a></li>
+        <br><br><br><br>
+        <li><a href="/admin/login">管理者ログイン</a></li>
+        </ul>
+    </aside>
+    <main class="content">
+        <h1>あいうえお美術館</h1>
+        <h2>管理者ページ</h2>
+        <div class="container">
+            <h3>会員検索結果一覧</h3>
+            <div class="container">
+                <form action="{{ url_for('main.admin_search_form') }}" method="GET">
+                    <button type="submit">戻る</button>
+                </form><br>             
+                {% if users %}
+                    <table border="1" style="margin-top:20px;">
+                        <tr>
+                            <th>ID</th>
+                            <th>名前</th>
+                            <th>電話</th>
+                            <th>住所</th>
+                            <th>ステータス</th>
+                            <th>詳細</th>
+                        </tr>
+                        {% for u in users %}
+                        <tr>
+                            <td>{{ u.id }}</td>
+                            <td>{{ u.name }}</td>
+                            <td>{{ u.email }}</td>
+                            <td>{{ u.address }}</td>
+                            <td>{{ u.membership_status }}</td>
+                            <td>
+                                <form action="{{ url_for('main.admin_user_detail', id=u.id) }}" method="GET">
+                                    <button type="submit">詳細表示</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                {% endif %}
+            </div>
+            <br><br>
+        </div>
+    </main>
+</body>
+   
+</html>

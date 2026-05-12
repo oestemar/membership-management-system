@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- <link rel="stylesheet" href="../static/style.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+	<aside class="menu">
+    <ul>
+        <li><a href="/">TOP</a></li>
+        <li><a href="/register">会員登録</a></li>
+        <li><a href="/login">会員ログイン</a></li>
+        <br><br><br><br>
+        <li><a href="/admin/login">管理者ログイン</a></li>
+    </ul>
+    </aside>
+    <main class="content">
+        <h1>あいうえお美術館</h1>
+        <h2>管理者ページ</h2>
+		<h3>会員情報をCSV形式でインポート・エクスポートできます</h3>
+
+		{% with messages = get_flashed_messages(category_filter=["im_ex_port"]) %}
+			{% if messages %}
+				<div class="flash">
+				{% for message in messages %}
+					<p>{{ message }}</p>
+				{% endfor %}
+				</div>
+			{% endif %}
+		{% endwith %}
+
+		<div class="container">
+			<p1>CSVデータの列構成</p1><br>
+			<p1>1列目：名前</p1><br>
+			<p1>2列目：メール</p1><br>
+			<p1>3列目：郵便番号</p1><br>
+			<p1>4列目：住所</p1><br>
+			<p1>5列目：電話</p1><br>
+			<p1>6列目：パスワード　※インポート時</p1><br>
+			<p1>6列目：ステータス　※エクスポート時</p1><br><br>
+			<p1>6列構成のCSVデータをDBへインポートまたはDBからエクスポートできます。</p1>
+			<p1>※取り込み時は、1行目の見出しは飛ばし2行目から取り込みます</p1>
+			<br>
+			<div class="button-row">
+				<form action="{{ url_for('main.import_csv') }}" method="POST" enctype="multipart/form-data">
+					<input type="file" name="file" accept=".csv">
+					<button type="submit">CSVをインポート</button>
+				</form>
+				<form action="{{ url_for('main.export_csv') }}" method="GET">
+				    <button type="submit">CSVをエクスポート</button>
+				</form>
+				<br><br>
+				<form action="{{ url_for('main.admin_search_form') }}" method="GET">
+					<button type="submit">戻る</button>
+				</form>       
+			</div>
+		</div>
+
+	</main>
+</body>
+</html>
+
+	

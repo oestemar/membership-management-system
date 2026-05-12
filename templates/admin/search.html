@@ -1,0 +1,71 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- <link rel="stylesheet" href="../static/style.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+     <aside class="menu">
+     <ul>
+          <li><a href="/">TOP</a></li>
+          <li><a href="/register">会員登録</a></li>
+          <li><a href="/login">会員ログイン</a></li>
+          <br><br><br><br>
+          <li><a href="/admin/login">管理者ログイン</a></li>
+        </ul>
+     </aside>
+     <main class="content">
+          <h1>あいうえお美術館</h1>
+          <h2>管理者ページ</h2>
+          <h3>検索・各種メニュー</h3>
+
+          {% with messages = get_flashed_messages(category_filter=["search"]) %}
+               {% if messages %}
+               <div class="flash">
+                    {% for message in messages %}
+                    <p>{{ message }}</p>
+                    {% endfor %}
+               </div>
+               {% endif %}
+          {% endwith %}
+
+          <div class="container">
+               <form action="{{ url_for('main.admin_search_results') }}" method="post">
+                    <label>名前：</label>
+                    <input type="text" name="name" placeholder="名前の一部を入力"><br>
+                    <label>メール：</label>
+                    <input type="text" name="email" placeholder="メールの一部を入力"><br>			
+                    <label>住所：</label>
+                    <input type="text" name="address" placeholder="住所の一部を入力"><br>
+                    <label>ステータス：</label>
+                    <select name="status">
+                    <option value="">-- 選択してください --</option>
+                    <option value="活動中">活動中</option>
+                    <option value="休会中">休会</option>
+                    <option value="退会">退会</option>
+                    </select>
+                    <br><br>	
+                    <button type="submit">検索</button>
+               </form><br><br>
+               <form action="{{ url_for('main.im_ex_port_files') }}" method="GET">
+                    <button type="submit">CSVインポート/CSVエクスポート</button>
+               </form><br>
+               <div class="button-row">
+                    <form action="{{ url_for('main.change_admins_password') }}" method="GET">
+                         <button type="submit" name="target" value="admin01">パスワード変更（admin01）</button>
+                    </form>                 
+                    <form action="{{ url_for('main.change_admins_password') }}" method="GET">
+                         <button type="submit"name="target" value="super">パスワード変更（super）</button>
+                    </form>
+                    <form action="/admin/logout" method="GET">
+                         <button type="submit">ログアウト</button>
+                    </form>
+               </div>
+          </div>
+     </main>
+</body>
+   
+</html>

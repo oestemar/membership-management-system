@@ -1,0 +1,21 @@
+■admin01,superという２つのパスワードのハッシュ値を生成するPythonコード
+Pythonにログインして、対話シェル内で一行ずつ実行
+
+from werkzeug.security import generate_password_hash
+
+print(generate_password_hash("admin01"))
+print(generate_password_hash("super"))
+
+■ハッシュ値をSQLに登録する
+
+INSERT INTO admins (username, password_hash, role)
+VALUES
+('admin01', 'ここにハッシュ値', 'admin'),
+('super', 'ここにハッシュ値', 'super');
+
+■ハッシュ値の更新時
+
+UPDATE admins
+SET password_hash = 'ここに新しいハッシュ値'
+WHERE username = 'admin01';
+

@@ -28,7 +28,10 @@ noreply.aiueosystem@gmail.com
     body = render_template_string(body_template, user=user)
     msg = Message(subject, recipients=[user.email])
     msg.body = body
-    mail.send(msg)
+    try:
+        mail.send(msg)
+    except Exception as e:
+        print("MAIL ERROR:", e)
 
     # ログ保存
     log = MailLog(
@@ -63,8 +66,11 @@ noreply.aiueosystem@gmail.com
     body = render_template_string(body_template, user=user, withdrawn_at=withdrawn_at)
     msg = Message(subject, recipients=[user.email])
     msg.body = body
-    mail.send(msg)
-
+    try:
+        mail.send(msg)
+    except Exception as e:
+        print("MAIL ERROR:", e)
+        
     # ログ保存
     log = MailLog(
         user_id=user.id,
@@ -77,7 +83,7 @@ noreply.aiueosystem@gmail.com
 def send_password_reset_mail(user, reset_url, mail):
     subject = "あいうえお美術館：パスワードリセット手続き"
     body_template = """
-{{ email }}様
+{{ user.email }}様
 
 あいうえお美術館のパスワードリセット手続きは下記リンクを開いて進めてください。
 
@@ -91,11 +97,14 @@ def send_password_reset_mail(user, reset_url, mail):
 noreply.aiueosystem@gmail.com
 """
 
-    body = render_template_string(body_template, email=user.email, reset_url=reset_url)
+    body = render_template_string(body_template, user=user, reset_url=reset_url)
 
     msg = Message(subject, recipients=[user.email])
     msg.body = body
-    mail.send(msg)
+    try:
+        mail.send(msg)
+    except Exception as e:
+        print("MAIL ERROR:", e)
 
     # ログ保存
     log = MailLog(

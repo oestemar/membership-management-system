@@ -141,7 +141,7 @@ def register():
 
         # メール送信
         try:
-#            send_register_mail(user, mail)
+            send_register_mail(user, mail)
             flash("登録が完了しました", "register")
         except Exception as e:
             print("MAIL ERROR:", e)
@@ -401,7 +401,11 @@ def withdraw():
     db.session.commit()
 
     withdrawn_at = datetime.now()
-#    send_withdraw_mail(current_user, mail, withdrawn_at)
+    try:
+        send_withdraw_mail(current_user, mail, withdrawn_at)
+        flash("登録が完了しました", "withdraw")
+    except Exception as e:
+        print("MAIL ERROR:", e)
 
     logout_user()
     session.clear()

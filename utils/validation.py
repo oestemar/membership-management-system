@@ -70,7 +70,7 @@ def validate_user_input(data, check_email_duplicate=True, check_password=True,
     if check_password and (password != password_check):
         return "新しいパスワードが一致しません"
 
-    # ★ 電話番号が空欄なら完全にスルー（任意入力）
+    # 電話番号が空欄なら完全にスルー
     if phone:
         # ハイフン除去
         phone_clean = phone.replace("-", "")

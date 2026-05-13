@@ -129,7 +129,7 @@ def register():
         # メール送信
         try:
             send_register_mail(user)
-            flash("登録が完了しました", "register")
+            flash("登録が完了しました", "login")
         except Exception as e:
             print("MAIL ERROR:", e)
 

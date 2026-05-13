@@ -1,7 +1,6 @@
 from flask import Blueprint, request, render_template, redirect, url_for, flash, session, Flask, Response, get_flashed_messages
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
-from flask_mail import Mail
 from flask_migrate import Migrate
 from models import User, Admin, db
 from datetime import datetime
@@ -32,18 +31,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # DB 初期化
 db.init_app(app)
-
-# SMTP 接続設定
-app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
-app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
-app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True') == 'True'
-app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL', 'False') == 'True'
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
-
-# Mail 初期化
-mail = Mail(app)
 
 # Migrate 初期化
 migrate = Migrate(app, db)
@@ -141,7 +128,7 @@ def register():
 
         # メール送信
         try:
-            send_register_mail(user, mail)
+            send_register_mail(user)
             flash("登録が完了しました", "register")
         except Exception as e:
             print("MAIL ERROR:", e)
@@ -212,7 +199,7 @@ def forget_pw():
         reset_url = url_for('main.reset_password', token=token, _external=True)
 
         # メール送信
-        send_password_reset_mail(user, reset_url, mail)
+        send_password_reset_mail(user, reset_url)
 
         flash("パスワードリセット用メールを送信しました", "login")
         return redirect(url_for('main.login'))
@@ -402,7 +389,7 @@ def withdraw():
 
     withdrawn_at = datetime.now()
     try:
-        send_withdraw_mail(current_user, mail, withdrawn_at)
+        send_withdraw_mail(current_user, withdrawn_at)
         flash("登録が完了しました", "withdraw")
     except Exception as e:
         print("MAIL ERROR:", e)

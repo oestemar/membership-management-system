@@ -1,18 +1,21 @@
-from flask_mail import Message
+import os
+import threading
+import resend
 from flask import render_template_string, current_app
 from datetime import datetime, timezone, timedelta
 from webapp import db
 from models import MailLog
-import threading
 
-def async_send_mail(app, msg, mail):
+resend.api_key = os.environ.get("RESEND_API_KEY")
+
+def async_send_mail(app, params):
     with app.app_context():
         try:
-            mail.send(msg)
+            resend.Emails.send(params)
         except Exception as e:
             print("MAIL SEND ERROR:", e)
 
-def send_register_mail(user, mail):
+def send_register_mail(user):
     subject = "あいうえお美術館会員登録完了のお知らせ"
     body_template = """
 {{ user.name }}様
@@ -34,26 +37,32 @@ noreply.aiueosystem@gmail.com
 """
 
     body = render_template_string(body_template, user=user)
-    msg = Message(subject, recipients=[user.email])
-    msg.body = body
+
+    params = {
+        "from": "onboarding@resend.dev",
+        "to": user.email,
+        "subject": subject,
+        "text": body
+    }
 
     # 非同期で送信
     threading.Thread(
         target=async_send_mail, 
-        args=(current_app._get_current_object(), msg, mail),
+        args=(current_app._get_current_object(), params),
         daemon=True
         ).start()
     
     # ログ保存
-    log = MailLog(
-        user_id=user.id,
-        mail_type="register",
-        sent_at=datetime.now(timezone(timedelta(hours=9)))
-    )
-    db.session.add(log)
-    db.session.commit()
+    if user.id is not None:
+        log = MailLog(
+            user_id=user.id,
+            mail_type="register",
+            sent_at=datetime.now(timezone(timedelta(hours=9)))
+        )
+        db.session.add(log)
+        db.session.commit()
 
-def send_withdraw_mail(user, mail, withdrawn_at):
+def send_withdraw_mail(user, withdrawn_at):
     subject = "あいうえお美術館退会手続き完了のお知らせ"
     body_template = """
 {{ user.name }}様
@@ -75,26 +84,32 @@ noreply.aiueosystem@gmail.com
 """
 
     body = render_template_string(body_template, user=user, withdrawn_at=withdrawn_at)
-    msg = Message(subject, recipients=[user.email])
-    msg.body = body
+
+    params = {
+        "from": "onboarding@resend.dev",
+        "to": user.email,
+        "subject": subject,
+        "text": body
+    }
 
     # 非同期で送信
     threading.Thread(
         target=async_send_mail, 
-        args=(current_app._get_current_object(), msg, mail),
+        args=(current_app._get_current_object(), params),
         daemon=True
         ).start()
 
     # ログ保存
-    log = MailLog(
-        user_id=user.id,
-        mail_type="withdraw",
-        sent_at=datetime.now(timezone(timedelta(hours=9)))
-    )
-    db.session.add(log)
-    db.session.commit()
+    if user.id is not None:
+        log = MailLog(
+            user_id=user.id,
+            mail_type="withdraw",
+            sent_at=datetime.now(timezone(timedelta(hours=9)))
+        )
+        db.session.add(log)
+        db.session.commit()
 
-def send_password_reset_mail(user, reset_url, mail):
+def send_password_reset_mail(user, reset_url):
     subject = "あいうえお美術館：パスワードリセット手続き"
     body_template = """
 {{ user.email }}様
@@ -113,21 +128,26 @@ noreply.aiueosystem@gmail.com
 
     body = render_template_string(body_template, user=user, reset_url=reset_url)
 
-    msg = Message(subject, recipients=[user.email])
-    msg.body = body
+    params = {
+        "from": "onboarding@resend.dev",
+        "to": user.email,
+        "subject": subject,
+        "text": body
+    }
 
     # 非同期で送信
     threading.Thread(
         target=async_send_mail, 
-        args=(current_app._get_current_object(), msg, mail),
+        args=(current_app._get_current_object(), params),
         daemon=True
         ).start()
 
     # ログ保存
-    log = MailLog(
-        user_id=user.id,
-        mail_type="password-reset",
-        sent_at=datetime.now(timezone(timedelta(hours=9)))
-    )
-    db.session.add(log)
-    db.session.commit()
+    if user.id is not None:
+        log = MailLog(
+            user_id=user.id,
+            mail_type="password-reset",
+            sent_at=datetime.now(timezone(timedelta(hours=9)))
+        )
+        db.session.add(log)
+        db.session.commit()

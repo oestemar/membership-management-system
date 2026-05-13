@@ -1,8 +1,16 @@
 from flask_mail import Message
-from flask import render_template_string
+from flask import render_template_string, current_app
 from datetime import datetime, timezone, timedelta
 from webapp import db
 from models import MailLog
+import threading
+
+def async_send_mail(app, msg, mail):
+    with app.app_context():
+        try:
+            mail.send(msg)
+        except Exception as e:
+            print("MAIL SEND ERROR:", e)
 
 def send_register_mail(user, mail):
     subject = "あいうえお美術館会員登録完了のお知らせ"
@@ -28,11 +36,14 @@ noreply.aiueosystem@gmail.com
     body = render_template_string(body_template, user=user)
     msg = Message(subject, recipients=[user.email])
     msg.body = body
-    try:
-        mail.send(msg)
-    except Exception as e:
-        print("MAIL ERROR:", e)
 
+    # 非同期で送信
+    threading.Thread(
+        target=async_send_mail, 
+        args=(current_app._get_current_object(), msg, mail),
+        daemon=True
+        ).start()
+    
     # ログ保存
     log = MailLog(
         user_id=user.id,
@@ -66,11 +77,14 @@ noreply.aiueosystem@gmail.com
     body = render_template_string(body_template, user=user, withdrawn_at=withdrawn_at)
     msg = Message(subject, recipients=[user.email])
     msg.body = body
-    try:
-        mail.send(msg)
-    except Exception as e:
-        print("MAIL ERROR:", e)
-        
+
+    # 非同期で送信
+    threading.Thread(
+        target=async_send_mail, 
+        args=(current_app._get_current_object(), msg, mail),
+        daemon=True
+        ).start()
+
     # ログ保存
     log = MailLog(
         user_id=user.id,
@@ -101,10 +115,13 @@ noreply.aiueosystem@gmail.com
 
     msg = Message(subject, recipients=[user.email])
     msg.body = body
-    try:
-        mail.send(msg)
-    except Exception as e:
-        print("MAIL ERROR:", e)
+
+    # 非同期で送信
+    threading.Thread(
+        target=async_send_mail, 
+        args=(current_app._get_current_object(), msg, mail),
+        daemon=True
+        ).start()
 
     # ログ保存
     log = MailLog(

@@ -140,9 +140,12 @@ def register():
         db.session.commit()
 
         # メール送信
-        send_register_mail(user, mail)
-
-        flash("登録が完了しました", "register")
+        try:
+            send_register_mail(user, mail)
+            flash("登録が完了しました", "register")
+        except Exception as e:
+            print("MAIL ERROR:", e)
+                
         return redirect(url_for('main.login'))
 
     return render_template('user/register.html')

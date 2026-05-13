@@ -16,7 +16,7 @@ def send_register_mail(user, mail):
 ■登録情報
 お名前：{{ user.name }}
 メールアドレス：{{ user.email }}
-登録日時：{{ user.created_at }}
+登録日時：{{ user.created_at or '' }}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 今後とも当館を宜しくお願い致します。

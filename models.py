@@ -21,10 +21,10 @@ class User(UserMixin, db.Model):
     phone = db.Column(db.String(20))
 
     membership_status = db.Column(db.String(20), default='活動中')  
-    # active / inactive / withdrawn など
+    # active / inactive / withdrawn などfrom datetime import datetime, timezone
 
-    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
-    updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # パスワード設定
     def set_password(self, password):
@@ -50,8 +50,8 @@ class Admin(UserMixin, db.Model):
     password_hash = db.Column(db.String(512), nullable=False)
     role = db.Column(db.String(20), nullable=False)
 
-    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
-    updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # パスワード設定
     def set_password(self, password):

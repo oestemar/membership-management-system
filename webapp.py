@@ -9,9 +9,13 @@ from itsdangerous import URLSafeTimedSerializer
 import csv
 import io
 import os
+from flask import Flask
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = 'oestemar'
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
 # Flask-Login 初期化
 login_manager = LoginManager()
@@ -622,7 +626,7 @@ def change_admins_password():
     # パスワード変更画面へ
     return render_template("admin/ch_admins_password.html", target=target)
 
-# ログアウトfla
+# ログアウト
 @bp.route('/admin/logout', methods=['GET'])
 @login_required
 def admin_logout():
@@ -634,7 +638,7 @@ def admin_logout():
 # CSVインポート / エクスポート
 ########################################
 #CSVインポート/エクスポート画面
-@bp.route("/admin/users/in_ex_port", methods=["GET"])
+@bp.route("/admin/users/im_ex_port", methods=["GET"])
 def im_ex_port_files():
     return render_template("admin/im_ex_port.html")
 

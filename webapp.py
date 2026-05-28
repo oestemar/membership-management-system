@@ -89,7 +89,7 @@ def index():
 # 会員登録
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
-    get_flashed_messages()
+    get_flashed_messages(category_filter=["register"])
     if request.method == 'POST':
         # 入力値取得
         data = {
@@ -97,7 +97,7 @@ def register():
             "email": request.form.get('email', ''),
             "zip1": request.form.get('zip1', ''),
             "zip2": request.form.get('zip2', ''),
-            "zipcode": request.form.get('zipcode', ''),
+            "zipcode": (request.form.get('zip1', '') + request.form.get('zip2', '')),
             "address": request.form.get('address', ''),
             "phone": request.form.get('phone', ''),
             "password": request.form.get('password', ''),
@@ -105,16 +105,15 @@ def register():
         }
 
         # バリデーション実行
-        error = validate_user_input(data, check_email_duplicate=True)
+        errors = validate_user_input(data, check_email_duplicate=True, check_password=True, check_name=True, check_zipcode=True)
 
-        if error:
-            if "メールアドレス" in error:
-                data["email"] = ""
-            if "パスワード" in error:
-                data["password"] = ""
-                data["password_check"] = ""
+        if errors:
+            for err in errors:
+                if "パスワード" in err:
+                    data["password"] = ""
+                    data["password_check"] = ""
 
-            flash(error, "register")
+                flash(err, "register")
             return render_template('user/register.html', data=data)
 
         # DB登録
@@ -175,7 +174,7 @@ def forget_pw():
         }
 
         # バリデーション実行
-        error = validate_user_input(
+        errors = validate_user_input(
             data, 
             check_email_duplicate=False, 
             check_password=False, 
@@ -183,8 +182,9 @@ def forget_pw():
             check_zipcode=False
         )
 
-        if error:
-            flash(error,"forget_pw")
+        if errors:
+            for err in errors:
+                flash(err, "forget_pw")
             return render_template('user/forget_pw.html', data=data)
 
         # ユーザー取得
@@ -239,9 +239,10 @@ def reset_password(token):
             "pw_check": request.form.get('password_check', ''),
         }
         # バリデーション
-        error = validate_user_pw_input(data, pw, check_current=False)
-        if error:
-            flash(error, "reset_password")
+        errors = validate_user_pw_input(data, pw, check_current=False)
+        if errors:
+            for err in errors:
+                flash(err, "reset_password")
             return render_template('user/reset_password.html', token=token)
 
         # パスワード更新
@@ -277,32 +278,33 @@ def update_mypage():
             "email": request.form.get('email', ''),
             "zip1": request.form.get('zip1', ''),
             "zip2": request.form.get('zip2', ''),
-            "zipcode": request.form.get('zipcode', ''),
+            "zipcode": (request.form.get('zip1', '') + request.form.get('zip2', '')),
             "address": request.form.get('address', ''),
             "phone": request.form.get('phone', ''),
         }
 
         # バリデーション実行
-        error = validate_user_input(
+        errors = validate_user_input(
             data, 
             check_email_duplicate=True, 
             check_password=False,
             current_user_id=current_user.id
         )
 
-        if error:
-            if "メールアドレス" in error:
-                data["email"] = ""
-            if "パスワード" in error:
-                data["password"] = ""
+        if errors:
+            for err in errors:
+                if "メールアドレス" in err:
+                    data["email"] = ""
+                if "パスワード" in err:
+                    data["password"] = ""
 
-            flash(error, "mypage_edit")
-            return render_template(
-                'user/mypage_edit.html', 
-                data=data, 
-                zip1=data["zip1"], 
-                zip2=data["zip2"]
-            )
+                flash(err, "mypage_edit")
+        return render_template(
+            'user/mypage_edit.html', 
+            data=data, 
+            zip1=data["zip1"], 
+            zip2=data["zip2"]
+        )
 
         # DB更新
         current_user.name = data["name"]
@@ -369,10 +371,11 @@ def change_password():
         }
 
         # バリデーション実行
-        error = validate_user_pw_input(data, pw, check_current=True)
+        errors = validate_user_pw_input(data, pw, check_current=True)
 
-        if error:
-            flash(error, "ch_password")
+        if errors:
+            for err in errors:
+                flash(err, "ch_password")
             return render_template('user/ch_password.html')
 
         # DB更新
@@ -503,27 +506,28 @@ def admin_user_update(id):
             "email": request.form.get('email', ''),
             "zip1": request.form.get('zip1', ''),
             "zip2": request.form.get('zip2', ''),
-            "zipcode": request.form.get('zipcode', ''),
+            "zipcode": (request.form.get('zip1', '') + request.form.get('zip2', '')),
             "address": request.form.get('address', ''),
             "membership_status": user.membership_status,            
             "phone": request.form.get('phone', ''),
         }
 
         # バリデーション実行
-        error = validate_user_input(
+        errors = validate_user_input(
             data, 
             check_email_duplicate=False,
             check_password=False,
             current_user_id=current_user.id
         )
 
-        if error:
-            if "メールアドレス" in error:
-                data["email"] = ""
-            if "パスワード" in error:
-                data["password"] = ""
+        if errors:
+            for err in errors:
+                if "メールアドレス" in err:
+                    data["email"] = ""
+                if "パスワード" in err:
+                    data["password"] = ""
 
-            flash(error, "user_detail_edit")
+                flash(err, "user_detail_edit")
             return render_template(
                 'admin/user_detail_edit.html', 
                 data=data, 
@@ -610,10 +614,11 @@ def change_admins_password():
         }
 
         # バリデーション実行
-        error = validate_user_pw_input(data, pw, check_current=True)
+        errors = validate_user_pw_input(data, pw, check_current=True)
 
-        if error:
-            flash(error, "ch_admins_password")
+        if errors:
+            for err in errors:
+                flash(err, "ch_admins_password")
             return render_template('admin/ch_admins_password.html', target=target)
 
         # DB更新

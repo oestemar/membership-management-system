@@ -299,12 +299,12 @@ def update_mypage():
                     data["password"] = ""
 
                 flash(err, "mypage_edit")
-        return render_template(
-            'user/mypage_edit.html', 
-            data=data, 
-            zip1=data["zip1"], 
-            zip2=data["zip2"]
-        )
+            return render_template(
+                'user/mypage_edit.html', 
+                data=data, 
+                zip1=data["zip1"], 
+                zip2=data["zip2"]
+            )
 
         # DB更新
         current_user.name = data["name"]

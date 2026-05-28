@@ -33,13 +33,13 @@ def send_register_mail(user):
 今後とも当館を宜しくお願い致します。
 
 あいうえお美術館会員管理システム
-noreply.aiueosystem@gmail.com
+noreply@oestemar-portfolio.xyz
 """
 
     body = render_template_string(body_template, user=user)
 
     params = {
-        "from": "onboarding@resend.dev",
+        "from": os.getenv("MAIL_FROM"),
         "to": user.email,
         "subject": subject,
         "text": body
@@ -80,13 +80,13 @@ def send_withdraw_mail(user, withdrawn_at):
 またのご利用を心よりお待ちしております。
 
 あいうえお美術館会員管理システム
-noreply.aiueosystem@gmail.com
+noreply@oestemar-portfolio.xyz
 """
 
     body = render_template_string(body_template, user=user, withdrawn_at=withdrawn_at)
 
     params = {
-        "from": "onboarding@resend.dev",
+        "from": os.getenv("MAIL_FROM"),
         "to": user.email,
         "subject": subject,
         "text": body
@@ -123,13 +123,13 @@ def send_password_reset_mail(user, reset_url):
 ※1時間以内にパスワード更新作業を完了しないとキャンセルとなります。
 
 あいうえお美術館会員管理システム
-noreply.aiueosystem@gmail.com
+noreply@oestemar-portfolio.xyz
 """
 
     body = render_template_string(body_template, user=user, reset_url=reset_url)
 
     params = {
-        "from": "onboarding@resend.dev",
+        "from": os.getenv("MAIL_FROM"),
         "to": user.email,
         "subject": subject,
         "text": body

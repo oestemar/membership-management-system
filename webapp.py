@@ -75,11 +75,15 @@ def create_admin():
     db.session.commit()
     return "Initial admins created"
 
-# バージョン確認用
-@app.route('/version')
-def version():
-    import werkzeug
-    return f"Werkzeug version: {werkzeug.__version__}"
+@app.route('/fix_demo')
+def fix_demo():
+    from werkzeug.security import generate_password_hash
+    new_hash = generate_password_hash("test")
+    cursor = db.cursor()
+    cursor.execute("UPDATE admins SET password_hash=%s WHERE username='demo'", (new_hash,))
+    db.commit()
+    return "done"
+
 
 ########################################
 # 一般ユーザー向け

@@ -73,9 +73,13 @@ def create_admin():
     db.session.add(admin01)
     db.session.add(super_admin)
     db.session.commit()
-
     return "Initial admins created"
 
+# バージョン確認用
+@app.route('/version')
+def version():
+    import werkzeug
+    return f"Werkzeug version: {werkzeug.__version__}"
 
 ########################################
 # 一般ユーザー向け

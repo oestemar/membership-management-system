@@ -21,7 +21,7 @@ GitHub を用いてバージョン管理を行っています。
 - SQLAlchemy
 - Railway（本番環境）
 - GitHub（ソース管理）
-- Resend（メール送信予定）
+- Resend（メール送信）
 - HTML / CSS
 
 ## ３．ディレクトリ構成
@@ -72,6 +72,8 @@ membership-management-system/
 - 管理者ログイン
 - 会員一覧
 - 会員削除
+- 会員情報編集
+- CSVインポート・エクスポート
 - メールログ確認
 
 ## ５．画面一覧
@@ -109,11 +111,8 @@ admins
 mail_logs
      ├──  id (PK)
      ├──  user_id (FK → users.id)
-     ├──  email
-     ├──  subject
-     ├──  body
-     ├──  sent_at
-     └──  status
+     ├──  mail_type
+     └──  sent_at
 
 ## ローカル環境構築
 1. 仮想環境作成
@@ -123,7 +122,7 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 2. パッケージインストール
 コード
 pip install -r requirements.txt
-3. .env を作成（例）
+3. .env を作成（ローカル環境変数）
 コード
 SECRET_KEY=xxxx
 DATABASE_URL=mysql+pymysql://user:pass@localhost/dbname
@@ -146,13 +145,13 @@ Variables を設定
 Deploy ボタンを押すだけ
 
 ## メール送信（Resend）
-現在、メール送信は Resend の新規ドメイン（aiueo-system.com）伝播待ち。
+現在、メール送信は新規ドメイン（oestemar-portfolio.xyz）をResendに登録して使用。
 Verified 後に以下を設定：
 
 コード
-MAIL_FROM=noreply@aiueo-system.com
+MAIL_FROM=noreply@oestemar-portfolio.xyz
 
-## テスト手順
+## テスト手順（docs>テスト手順書参照）
 会員側
 新規登録
 ログイン

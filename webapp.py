@@ -498,6 +498,20 @@ def admin_user_detail(id):
 @login_required
 def admin_user_update(id):
     user = User.query.get_or_404(id)
+    # Demo 管理者は編集前に当該会員のパスワード確認が必要
+    verification_key = f'demo_edit_verified_{id}'
+
+    # パスワード確認フォームの送信（demo 用）
+    if request.method == 'POST' and request.form.get('action') == 'verify_member_password':
+        member_pw = request.form.get('member_password', '')
+        if user.check_password(member_pw):
+            session[verification_key] = True
+            return redirect(url_for('main.admin_user_update', id=id))
+        else:
+            flash('パスワードが一致しません', 'user_detail')
+            return redirect(url_for('main.admin_user_detail', id=id))
+
+    # 通常の編集処理（保存）
     if request.method == 'POST':
         # 入力値取得
         data = {
@@ -542,6 +556,8 @@ def admin_user_update(id):
         user.address = data["address"]
         user.phone = data["phone"]
         db.session.commit()
+        # 編集セッションフラグを消す
+        session.pop(verification_key, None)
         flash("更新しました", "user_detail")
         return redirect(url_for('main.admin_user_detail', id=id))
     
@@ -562,17 +578,49 @@ def admin_user_update(id):
         "membership_status": user.membership_status,
         "password": ""
     }
+    # demo 管理者の場合、編集前に確認済みでなければパスワード入力画面へ
+    if current_user.username == 'demo' and not session.get(verification_key):
+        return render_template(
+            'admin/confirm_member_password.html',
+            user=user,
+            form_action=url_for('main.admin_user_update', id=id),
+            title='編集のための確認',
+            button_text='確認'
+        )
+
     return render_template('admin/user_detail_edit.html', data=data)
 
-# 会員削除（上位管理者のみ）
-@bp.route('/admin/users/delete/<int:id>', methods=['POST'])
+@bp.route('/admin/users/delete/<int:id>', methods=['GET', 'POST'])
 @login_required
 def admin_user_delete(id):
-    if current_user.role != 'super':
+    user = User.query.get_or_404(id)
+    verification_key = f'demo_edit_verified_{id}'
+    
+    # ① demo-admin のパスワード確認処理
+    if current_user.role == 'demo_admin':
+        # パスワード確認フォームの送信（demo 用）
+        if request.method == 'POST' and request.form.get('action') == 'verify_member_password':
+            member_pw = request.form.get('member_password', '')
+            if user.check_password(member_pw):
+                session[verification_key] = True
+            else:
+                flash('パスワードが一致しません', 'user_detail')
+                return redirect(url_for('main.admin_user_detail', id=id))
+
+        # 初回はパスワード入力画面へ
+        if not session.get(verification_key):
+            return render_template(
+                'admin/confirm_member_password.html',
+                user=user,
+                form_action=url_for('main.admin_user_delete', id=id),
+                title='削除のための確認',
+                button_text='削除を進める'
+            )
+        
+
+    if current_user.role not in ['super','demo_admin']:
         flash("権限がありません", "user_detail")
         return redirect(url_for('main.admin_user_detail', id=id))
-    
-    user = User.query.get_or_404(id)
 
     if user.membership_status != '退会':
         flash("当会員は退会していません", "user_detail")
@@ -582,7 +630,9 @@ def admin_user_delete(id):
     db.session.commit()
 
     flash("削除しました")
-    return redirect(url_for('main.admin_search_form'))
+
+    return redirect(url_for('main.admin_search_results'))
+
 
 # 管理者パスワード変更
 @bp.route('/ch_admins_password', methods=['GET', 'POST'])
@@ -594,8 +644,16 @@ def change_admins_password():
 
     # 対象管理者を DB から取得
     target = Admin.query.filter_by(username=target_username).first()
+    if not target:
+        flash("対象の管理者が見つかりません", "search")
+        return redirect(url_for('main.admin_search_form'))
 
-    # super 以外は admin01 のパスワード変更画面に入れない
+    # demo 管理者はパスワード変更不可
+    if current_user.username == 'demo':
+        flash("権限がありません", "search")
+        return render_template('admin/search.html')
+
+    # super 以外は自身のパスワードのみ変更可
     if current_user.role != "super" and target.username != current_user.username:
         flash("権限がありません", "search")
         return render_template('admin/search.html')
@@ -650,6 +708,11 @@ def im_ex_port_files():
 @bp.route('/admin/users/import', methods=['POST'])
 @login_required
 def import_csv():
+        # demo 管理者はCSVインポート不可
+    if current_user.username == 'demo':
+        flash("権限がありません", "search")
+        return render_template('admin/search.html')
+
     if current_user.role != 'super':
         flash("権限がありません", "search")
         return redirect(url_for('main.admin_search_form'))

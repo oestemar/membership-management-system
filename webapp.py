@@ -49,54 +49,40 @@ bp = Blueprint('main', __name__)
 #管理者設定のため一度だけ実行
 #####################################
 
-@app.route('/create_admin')
-def create_admin():
-    # すでに super が存在するなら実行しない（初期化は一度だけ）
+@app.route('/init_admins')
+def init_admins():
+    from werkzeug.security import generate_password_hash
+
+    # すでに super が存在するなら実行しない
     existing_super = Admin.query.filter_by(username='super').first()
     if existing_super:
         return "Admins already created", 403
 
-    from werkzeug.security import generate_password_hash
-
-    # 通常管理者 admin01
     admin01 = Admin(
         username='admin01',
         role='admin',
         password_hash=generate_password_hash('admin01')
     )
 
-    # 上位管理者 super
     super_admin = Admin(
         username='super',
         role='super',
         password_hash=generate_password_hash('super')
     )
 
-    db.session.add(admin01)
-    db.session.add(super_admin)
-    db.session.commit()
-    return "Initial admins created"
-
-@app.route('/add_demo_admin')
-def add_demo_admin():
-
-    from werkzeug.security import generate_password_hash
-
-    # すでに demo が存在するか確認
-    existing_demo = Admin.query.filter_by(username='demo').first()
-    if existing_demo:
-        return "demo already exists", 403
-
-    # デモ用管理者 demo
-    demo = Admin(
+    demo_admin = Admin(
         username='demo',
         role='demo_admin',
         password_hash=generate_password_hash('test')
     )
 
-    db.session.add(demo)
+    db.session.add(admin01)
+    db.session.add(super_admin)
+    db.session.add(demo_admin)
     db.session.commit()
-    return "Initial demo_admin created"
+
+    return "Initial admins (admin01, super, demo) created"
+
 
 ########################################
 # 一般ユーザー向け

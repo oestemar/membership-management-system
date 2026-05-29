@@ -43,7 +43,7 @@ migrate = Migrate(app, db)
 from utils.mail import send_register_mail, send_withdraw_mail, send_password_reset_mail
 
 bp = Blueprint('main', __name__)
-app.register_blueprint(bp)
+
 
 #####################################
 #管理者設定のため一度だけ実行
@@ -820,7 +820,7 @@ def export_csv():
 
     return response
 
-
+app.register_blueprint(bp)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)

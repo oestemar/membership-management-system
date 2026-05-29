@@ -78,10 +78,15 @@ def create_admin():
 @app.route('/fix_demo')
 def fix_demo():
     from werkzeug.security import generate_password_hash
-    new_hash = generate_password_hash("test")
-    cursor = db.cursor()
-    cursor.execute("UPDATE admins SET password_hash=%s WHERE username='demo'", (new_hash,))
-    db.commit()
+    new_hash = generate_password_hash("demo123")
+
+    # SQLAlchemy を使って更新
+    db.session.execute(
+        "UPDATE admins SET password_hash = :hash WHERE username = 'demo'",
+        {"hash": new_hash}
+    )
+    db.session.commit()
+
     return "done"
 
 

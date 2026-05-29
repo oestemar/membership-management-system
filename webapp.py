@@ -81,6 +81,11 @@ def add_demo_admin():
 
     from werkzeug.security import generate_password_hash
 
+    # すでに demo が存在するか確認
+    existing_demo = Admin.query.filter_by(username='demo').first()
+    if existing_demo:
+        return "demo already exists", 403
+
     # デモ用管理者 demo
     demo = Admin(
         username='demo',

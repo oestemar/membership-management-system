@@ -78,7 +78,7 @@ def create_admin():
 @app.route('/fix_demo')
 def fix_demo():
     from werkzeug.security import generate_password_hash
-    new_hash = generate_password_hash("demo123")
+    new_hash = generate_password_hash("test")
 
     # SQLAlchemy を使って更新
     db.session.execute(

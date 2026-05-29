@@ -759,7 +759,7 @@ def import_csv():
 @bp.route('/admin/users/export')
 @login_required
 def export_csv():
-    if current_user.role != 'super':
+    if current_user.role not in ['super', 'demo_admin']:
         flash("権限がありません", "search")
         return redirect(url_for('main.admin_search_form'))
 

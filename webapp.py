@@ -76,20 +76,21 @@ def create_admin():
     db.session.commit()
     return "Initial admins created"
 
-@app.route('/fix_demo')
-def fix_demo():
+@app.route('/add_demo_admin')
+def add_demo_admin():
+
     from werkzeug.security import generate_password_hash
-    new_hash = generate_password_hash("test")
 
-    # SQLAlchemy を使って更新
-    db.session.execute(
-        text("UPDATE admins SET password_hash = :hash WHERE username = 'demo'"),
-        {"hash": new_hash}
+    # デモ用管理者 demo
+    demo = Admin(
+        username='demo',
+        role='demo_admin',
+        password_hash=generate_password_hash('test')
     )
+
+    db.session.add(demo)
     db.session.commit()
-
-    return "done"
-
+    return "Initial demo_admin created"
 
 ########################################
 # 一般ユーザー向け

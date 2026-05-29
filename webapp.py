@@ -82,7 +82,7 @@ def fix_demo():
 
     # SQLAlchemy を使って更新
     db.session.execute(
-        "UPDATE admins SET password_hash = :hash WHERE username = 'demo'",
+        text("UPDATE admins SET password_hash = :hash WHERE username = 'demo'"),
         {"hash": new_hash}
     )
     db.session.commit()

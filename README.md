@@ -151,19 +151,8 @@ Verified 後に以下を設定：
 コード
 MAIL_FROM=noreply@oestemar-portfolio.xyz
 
-## テスト手順（docs>テスト手順書参照）
-会員側
-新規登録
-ログイン
-ログアウト
-退会
-メールログ確認
+## [テスト手順書はこちら](docs/テスト手順書.md)
 
-管理者側
-管理者ログイン
-会員一覧表示
-会員削除
-メールログ確認
 
 📄 ライセンス
 This project is for portfolio use.

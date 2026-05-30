@@ -25,6 +25,7 @@ GitHub を用いてバージョン管理を行っています。
 - HTML / CSS
 
 ## ３．ディレクトリ構成
+```
 membership-management-system/
 ├──  webapp.py 
 ├──  models.py
@@ -59,7 +60,7 @@ membership-management-system/
                └── users.html
 └──  static/
           └──  style.css
-
+```
 ## ４．主な機能
 - 会員側
 - 新規登録
@@ -88,6 +89,7 @@ membership-management-system/
 
 ## ER 図
 コード
+```
 users
      ├──  id (PK)
      ├──  name
@@ -113,7 +115,7 @@ mail_logs
      ├──  user_id (FK → users.id)
      ├──  mail_type
      └──  sent_at
-
+```
 ## ローカル環境構築
 1. 仮想環境作成
 コード
@@ -151,7 +153,7 @@ Verified 後に以下を設定：
 コード
 MAIL_FROM=noreply@oestemar-portfolio.xyz
 
-## [テスト手順書はこちら](docs/テスト手順書.md)
+## [テスト手順書はこちらをクリック](docs/test_procedure.md)
 
 
 📄 ライセンス
